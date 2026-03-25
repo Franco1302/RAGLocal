@@ -7,7 +7,10 @@ from rag_local.vectorstores.faiss_store import FaissStore
 
 
 class RagService:
+    """Coordina retrieval y generacion para responder preguntas de usuarios."""
+
     def __init__(self, settings: Settings) -> None:
+        """Inicializa clientes y componentes del pipeline con la configuracion activa."""
         self.settings = settings
         self.ollama = OllamaClient(base_url=str(settings.ollama_base_url))
         self.embedding_service = EmbeddingService(
@@ -22,9 +25,11 @@ class RagService:
         )
 
     def healthcheck(self) -> bool:
+        """Comprueba disponibilidad del servidor Ollama."""
         return self.ollama.healthcheck()
 
     def answer(self, question: str) -> dict:
+        """Resuelve una pregunta recuperando contexto y generando la respuesta final."""
         contexts = self.retriever.retrieve(query=question, top_k=self.settings.rag_top_k)
         if not contexts:
             return {

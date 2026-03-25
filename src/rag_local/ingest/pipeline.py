@@ -19,6 +19,7 @@ def run_ingestion(
     chunk_size: int,
     chunk_overlap: int,
 ) -> int:
+    """Orquesta la ingesta completa y devuelve la cantidad total de chunks indexados."""
     docs = load_documents(source_dir)
     if not docs:
         return 0

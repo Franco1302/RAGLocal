@@ -9,12 +9,14 @@ from rag_local.ingest.pipeline import run_ingestion
 from rag_local.logging_utils import configure_logging
 from rag_local.rag_service import RagService
 
+# Punto de entrada CLI del proyecto.
 app = typer.Typer(add_completion=False, help="CLI para RAG local con Ollama remoto")
 console = Console()
 
 
 @app.command()
 def health() -> None:
+    """Comprueba si el servidor Ollama configurado responde correctamente."""
     settings = get_settings()
     configure_logging(settings.log_level)
     service = RagService(settings)
@@ -28,6 +30,7 @@ def health() -> None:
 
 @app.command()
 def ingest(source_dir: Path = typer.Option(..., help="Directorio con documentacion")) -> None:
+    """Ejecuta la ingesta completa: carga, chunking, embeddings e indexado."""
     settings = get_settings()
     configure_logging(settings.log_level)
 
@@ -51,6 +54,7 @@ def ingest(source_dir: Path = typer.Option(..., help="Directorio con documentaci
 
 @app.command()
 def query(question: str = typer.Option(..., help="Pregunta para el asistente")) -> None:
+    """Responde una pregunta usando retrieval sobre el indice FAISS."""
     settings = get_settings()
     configure_logging(settings.log_level)
     service = RagService(settings)

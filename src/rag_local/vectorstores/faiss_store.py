@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any, cast
 
 import faiss
 import numpy as np
@@ -8,7 +9,10 @@ import orjson
 
 
 class FaissStore:
+    """Gestiona construccion, persistencia y busqueda sobre un indice FAISS."""
+
     def __init__(self, index_dir: Path) -> None:
+        """Configura rutas de indice y metadatos dentro del directorio objetivo."""
         self.index_dir = index_dir
         self.index_file = self.index_dir / "vectors.faiss"
         self.meta_file = self.index_dir / "metadata.json"
@@ -16,9 +20,11 @@ class FaissStore:
         self.metadata: list[dict] = []
 
     def _ensure_dir(self) -> None:
+        """Crea el directorio de salida si aun no existe."""
         self.index_dir.mkdir(parents=True, exist_ok=True)
 
     def build(self, vectors: list[list[float]], metadata: list[dict]) -> None:
+        """Construye un indice normalizado a partir de vectores y metadatos asociados."""
         if not vectors:
             raise ValueError("No vectors provided")
         self._ensure_dir()
@@ -27,7 +33,7 @@ class FaissStore:
         faiss.normalize_L2(matrix)
 
         dim = matrix.shape[1]
-        index = faiss.IndexFlatIP(dim)
+        index = cast(Any, faiss.IndexFlatIP(dim))
         index.add(matrix)
 
         self.index = index
@@ -35,6 +41,7 @@ class FaissStore:
         self.persist()
 
     def persist(self) -> None:
+        """Guarda indice y metadatos en disco."""
         if self.index is None:
             raise ValueError("Index not initialized")
         self._ensure_dir()
@@ -42,12 +49,14 @@ class FaissStore:
         self.meta_file.write_bytes(orjson.dumps(self.metadata))
 
     def load(self) -> None:
+        """Carga desde disco un indice previamente generado."""
         if not self.index_file.exists() or not self.meta_file.exists():
             raise FileNotFoundError("Vector index not found. Run ingestion first.")
         self.index = faiss.read_index(str(self.index_file))
         self.metadata = orjson.loads(self.meta_file.read_bytes())
 
     def search(self, query_vector: list[float], top_k: int) -> list[dict]:
+        """Busca los top-k chunks mas similares y devuelve score junto a metadata."""
         if self.index is None:
             self.load()
         if self.index is None:
@@ -56,7 +65,8 @@ class FaissStore:
         query = np.array([query_vector], dtype="float32")
         faiss.normalize_L2(query)
 
-        distances, indices = self.index.search(query, top_k)
+        search_index = cast(Any, self.index)
+        distances, indices = search_index.search(query, top_k)
         results: list[dict] = []
 
         for score, idx in zip(distances[0], indices[0], strict=False):

@@ -6,19 +6,23 @@ import httpx
 
 
 class OllamaClient:
+    """Cliente HTTP para los endpoints de Ollama usados por el pipeline RAG."""
+
     def __init__(self, base_url: str, timeout_seconds: float = 60.0) -> None:
+        """Guarda la configuracion de conexion y normaliza la URL base."""
         self.base_url = base_url.rstrip("/")
         self.timeout_seconds = timeout_seconds
 
-    # Confirma que el servicio de Ollama está disponible haciendo una solicitud simple a la API de tags.
     def healthcheck(self) -> bool:
+        """Devuelve True cuando Ollama responde correctamente en /api/tags."""
         try:
             response = httpx.get(f"{self.base_url}/api/tags", timeout=self.timeout_seconds)
             return response.status_code == 200
         except httpx.HTTPError:
             return False
-    # Envía una solicitud POST a la API de embed de Ollama con el texto a ser embebido y devuelve el vector de embedding resultante.
+
     def embed(self, model: str, text: str) -> list[float]:
+        """Genera un vector de embedding para un texto individual."""
         payload = {"model": model, "input": text}
         response = httpx.post(
             f"{self.base_url}/api/embed",
@@ -31,8 +35,9 @@ class OllamaClient:
         if not embeddings:
             raise ValueError("Ollama did not return embeddings")
         return embeddings[0]
-    # Envía una solicitud POST a la API de generate de Ollama con el prompt y devuelve la respuesta generada por el modelo.
+
     def generate(self, model: str, prompt: str) -> str:
+        """Genera una respuesta de texto para un prompt usando el modelo de chat."""
         payload: dict[str, Any] = {
             "model": model,
             "prompt": prompt,

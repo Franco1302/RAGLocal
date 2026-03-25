@@ -1,4 +1,8 @@
+"""Utilidades para construir prompts con respuestas acotadas por evidencia."""
+
+
 def build_prompt(question: str, contexts: list[dict], max_context_chars: int = 7000) -> str:
+    """Construye un prompt estricto con contexto trazable y reglas anti-alucinacion."""
     safe_question = " ".join((question or "").split())
     if not safe_question:
         safe_question = "Sin pregunta"
