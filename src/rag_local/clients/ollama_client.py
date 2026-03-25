@@ -42,7 +42,13 @@ class OllamaClient:
             "model": model,
             "prompt": prompt,
             "stream": False,
-            "options": {"temperature": 0.2},
+            "options": {
+                "temperature": 0.1,
+                "top_p": 0.3,
+                "num_predict": 120,
+                "num_ctx": 2048,
+                "num_thread": 6,
+            },
         }
         response = httpx.post(
             f"{self.base_url}/api/generate",
