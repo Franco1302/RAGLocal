@@ -1,0 +1,20 @@
+ollama:
+  base_url: http://OLLAMA_HOST:11434
+  chat_model: CHAT_MODEL_NAME
+  embed_model: EMBEDDING_MODEL_NAME
+
+paths:
+  raw_dir: data/raw
+  processed_dir: data/processed
+  index_dir: data/vector_index
+
+chunking:
+  chunk_size: 1200
+  chunk_overlap: 150
+
+retrieval:
+  top_k: 5
+  score_threshold: 0.2
+
+runtime:
+  log_level: INFO
