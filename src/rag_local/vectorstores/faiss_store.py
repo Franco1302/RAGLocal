@@ -40,6 +40,30 @@ class FaissStore:
         self.metadata = metadata
         self.persist()
 
+    def append(self, vectors: list[list[float]], metadata: list[dict]) -> None:
+        """Agrega vectores y metadatos al indice existente sin reconstruirlo completo."""
+        if not vectors:
+            return
+
+        if self.index is None:
+            self.load()
+        if self.index is None:
+            raise RuntimeError("Vector index is not loaded")
+
+        matrix = np.array(vectors, dtype="float32")
+        faiss.normalize_L2(matrix)
+
+        append_index = cast(Any, self.index)
+        index_dim = int(getattr(append_index, "d"))
+        if matrix.shape[1] != index_dim:
+            raise ValueError(
+                f"Embedding dimension mismatch. Existing index={index_dim}, incoming={matrix.shape[1]}"
+            )
+
+        append_index.add(matrix)
+        self.metadata.extend(metadata)
+        self.persist()
+
     def persist(self) -> None:
         """Guarda indice y metadatos en disco."""
         if self.index is None:
