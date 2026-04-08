@@ -29,7 +29,10 @@ def health() -> None:
 
 
 @app.command()
-def ingest(source_dir: Path = typer.Option(..., help="Directorio con documentacion")) -> None:
+def ingest(
+    source_dir: Path = typer.Option(..., help="Directorio con documentacion"),
+    force: bool = typer.Option(False, "--force", "-f", help="Fuerza un reindexado completo desde cero"),
+) -> None:
     """Ejecuta la ingesta completa: carga, chunking, embeddings e indexado."""
     settings = get_settings()
     configure_logging(settings.log_level)
@@ -47,6 +50,7 @@ def ingest(source_dir: Path = typer.Option(..., help="Directorio con documentaci
         embedding_service=embedding_service,
         chunk_size=settings.rag_chunk_size,
         chunk_overlap=settings.rag_chunk_overlap,
+        force_rebuild=force,
     )
 
     console.print(f"[green]Ingestion completada. Chunks indexados: {total_chunks}[/green]")

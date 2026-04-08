@@ -39,6 +39,7 @@ def run_ingestion(
     embedding_service: EmbeddingService,
     chunk_size: int,
     chunk_overlap: int,
+    force_rebuild: bool = False,
 ) -> int:
     """Orquesta la ingesta completa y devuelve la cantidad total de chunks indexados."""
     docs = load_documents(source_dir)
@@ -60,7 +61,7 @@ def run_ingestion(
     ]
     removed_sources = [source for source in previous_signatures if source not in current_signatures]
 
-    requires_full_rebuild = bool(modified_docs or removed_sources)
+    requires_full_rebuild = bool(modified_docs or removed_sources) or force_rebuild
 
     # Primer run incremental sobre indice ya existente: reconstruimos para evitar duplicados.
     if not has_incremental_manifest and store.index_file.exists() and store.meta_file.exists():
@@ -71,23 +72,31 @@ def run_ingestion(
         return 0
 
     chunks: list[str] = []
+    vector_texts: list[str] = []
     metadata: list[dict] = []
 
     for doc in docs_to_process:
         doc_chunks = chunk_text(doc.text, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+        # Extraer un nombre legible desde la ruta
+        doc_title = Path(doc.source).stem.replace("-", " ").replace("_", " ")
+        
         for i, content in enumerate(doc_chunks):
-            chunks.append(content)
+            # Inyectar contexto base en el texto a vectorizar y guardar
+            context_text = f"DOCUMENTO: {doc_title}. CONTENIDO: {content}"
+            chunks.append(context_text)
+            vector_texts.append(context_text)
+            
             metadata.append(
                 {
                     "source": doc.source,
                     "chunk_id": i,
-                    "content": content,
+                    "content": context_text,
                 }
             )
 
     vectors = []
-    for chunk in tqdm(chunks, desc="Embedding chunks"):
-        vectors.append(embedding_service.embed_text(chunk))
+    for chunk_for_vector in tqdm(vector_texts, desc="Embedding chunks"):
+        vectors.append(embedding_service.embed_text(chunk_for_vector, task_type="document"))
 
     if requires_full_rebuild or not (store.index_file.exists() and store.meta_file.exists()):
         store.build(vectors=vectors, metadata=metadata)

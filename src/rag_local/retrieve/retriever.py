@@ -18,6 +18,6 @@ class Retriever:
 
     def retrieve(self, query: str, top_k: int) -> list[dict]:
         """Genera embedding de la consulta y retorna coincidencias filtradas por score."""
-        query_vector = self.embedding_service.embed_text(query)
+        query_vector = self.embedding_service.embed_text(query, task_type="query")
         matches = self.vector_store.search(query_vector=query_vector, top_k=top_k)
         return [item for item in matches if item["score"] >= self.score_threshold]

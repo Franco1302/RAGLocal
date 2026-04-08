@@ -17,11 +17,11 @@ class Settings(BaseSettings):
     rag_data_processed_dir: Path = Field(alias="RAG_DATA_PROCESSED_DIR")
     rag_vector_index_dir: Path = Field(alias="RAG_VECTOR_INDEX_DIR")
 
-    rag_chunk_size: int = Field(default=1200, alias="RAG_CHUNK_SIZE")
-    rag_chunk_overlap: int = Field(default=150, alias="RAG_CHUNK_OVERLAP")
+    rag_chunk_size: int = Field(default=800, alias="RAG_CHUNK_SIZE")
+    rag_chunk_overlap: int = Field(default=100, alias="RAG_CHUNK_OVERLAP")
 
-    rag_top_k: int = Field(default=5, alias="RAG_TOP_K")
-    rag_score_threshold: float = Field(default=0.2, alias="RAG_SCORE_THRESHOLD")
+    rag_top_k: int = Field(default=4, alias="RAG_TOP_K")
+    rag_score_threshold: float = Field(default=75.0, alias="RAG_SCORE_THRESHOLD")
 
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
 

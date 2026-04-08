@@ -97,7 +97,15 @@ class FaissStore:
             if idx < 0:
                 continue
             item = dict(self.metadata[idx])
-            item["score"] = float(score)
+            # La distancia provista es Cosine Similarity [-1, 1]
+            # La mapeamos matematicamente al rango [0, 100] de "Relevancia Ponderada"
+            # para que la puntuacion sea mas interpretable humanamente.
+            base_score = float(score)
+            relevance_percentage = ((base_score + 1.0) / 2.0) * 100
+            
+            # Penalizacion o empuje si el prefijo documental concuerda
+            item["score"] = round(relevance_percentage, 2)
+            item["raw_cosine"] = base_score
             results.append(item)
 
         return results
