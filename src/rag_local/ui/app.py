@@ -20,6 +20,86 @@ from rag_local.ui.utils import (
 MAX_UPLOAD_SIZE_BYTES = 25 * 1024 * 1024
 
 
+def apply_custom_theme() -> None:
+    """Aplica una paleta azul personalizada para la interfaz."""
+    st.markdown(
+        """
+        <style>
+        :root {
+            --adivin-bg: #261F47;
+            --adivin-surface: #2d2553;
+            --adivin-sidebar-bg: #342c64;
+            --adivin-accent: #17b2bc;
+            --adivin-border-soft: rgba(23, 178, 188, 0.34);
+            --adivin-button-bg: rgba(23, 178, 188, 0.12);
+            --adivin-text: #eaf7ff;
+        }
+
+        .stApp {
+            background:
+                radial-gradient(circle at 15% 10%, rgba(23, 178, 188, 0.18), transparent 35%),
+                linear-gradient(180deg, #261F47 0%, #1f193c 100%);
+            color: var(--adivin-text);
+        }
+
+        [data-testid="stHeader"] {
+            background: transparent;
+        }
+
+        [data-testid="stSidebar"] {
+            background: rgba(52, 44, 100, 0.94);
+            border-right: 1px solid var(--adivin-border-soft);
+        }
+
+        [data-testid="stVerticalBlockBorderWrapper"],
+        [data-testid="stMetric"],
+        .stAlert,
+        .stFileUploader,
+        .stChatMessage {
+            border: 1px solid var(--adivin-border-soft);
+            border-radius: 12px;
+            background: rgba(45, 37, 83, 0.6);
+        }
+
+        div[data-baseweb="tab-list"] button {
+            border: 1px solid var(--adivin-border-soft);
+            border-radius: 10px;
+            margin-right: 0.4rem;
+            padding: 0.55rem 1rem;
+            line-height: 1.2;
+        }
+
+        .stButton > button,
+        .stDownloadButton > button {
+            border: 1px solid var(--adivin-border-soft);
+            border-radius: 8px;
+            color: var(--adivin-text);
+            background: var(--adivin-button-bg);
+            padding: 0.45rem 0.95rem;
+        }
+
+        .stChatMessage [data-testid="stMarkdownContainer"],
+        .stChatMessage [data-testid="stMarkdownContainer"] p,
+        .stChatMessage [data-testid="stMarkdownContainer"] li,
+        .stChatMessage [data-testid="stMarkdownContainer"] span,
+        .stChatMessage [data-testid="stMarkdownContainer"] strong,
+        .stChatMessage [data-testid="stMarkdownContainer"] div {
+            color: #ffffff !important;
+        }
+
+        .stChatMessage [data-testid="stMarkdownContainer"] code {
+            color: #ffffff !important;
+        }
+
+        h1, h2, h3, p, label, span {
+            color: var(--adivin-text);
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 @st.cache_resource(show_spinner=False)
 def get_runtime() -> tuple[Settings, RagService]:
     """Inicializa configuracion y servicios una sola vez por sesion de servidor."""
@@ -257,8 +337,9 @@ def render_status_tab(settings: Settings) -> None:
 
 def main() -> None:
     """Punto de entrada principal de la aplicacion Streamlit."""
-    st.set_page_config(page_title="PruebaRAG UI", page_icon=":books:", layout="wide")
-    st.title("PruebaRAG - Streamlit")
+    st.set_page_config(page_title="AdivinChat", page_icon=":books:", layout="wide")
+    apply_custom_theme()
+    st.title("AdivinChat")
     st.caption("Sube PDFs, ejecuta ingestion y consulta el sistema RAG en modo chat.")
 
     try:
