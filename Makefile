@@ -1,4 +1,4 @@
-.PHONY: setup lint test ingest query run-help
+.PHONY: setup lint test ingest query ui run-help
 
 setup:
 	python -m pip install --upgrade pip
@@ -16,6 +16,9 @@ ingest:
 
 query:
 	rag query --question "Explica la arquitectura del sistema"
+
+ui:
+	python -m streamlit run src/rag_local/ui/app.py
 
 run-help:
 	rag --help
