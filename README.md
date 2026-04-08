@@ -44,6 +44,19 @@ rag ingest --source-dir data/raw
 rag query --question "Que dice la politica de backups?"
 ```
 
+## Interfaz web (Streamlit)
+La UI permite subir PDFs y preguntar sobre el indice RAG sin usar comandos CLI.
+
+```bash
+make ui
+```
+
+Flujo recomendado:
+1. Abrir la pestaña Upload en la UI.
+2. Subir uno o varios PDFs.
+3. Ejecutar la ingesta desde la misma pantalla.
+4. Ir a la pestaña Chat para hacer preguntas.
+
 ## Estructura
 - `src/rag_local`: codigo de aplicacion.
 - `docs`: arquitectura, seguridad, operacion y runbooks.
